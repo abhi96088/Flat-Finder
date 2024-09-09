@@ -1,4 +1,4 @@
-import 'package:flat_finder/common/login_screen.dart';
+import 'package:flat_finder/common/login_and_signup/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
