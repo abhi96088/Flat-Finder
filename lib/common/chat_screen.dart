@@ -70,7 +70,7 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: AppColors().green,
-        title: Text("Messages", style: TextStyle(fontSize: 18, fontFamily: "Poppins-Semibold", color: AppColors().darkGreen),),
+        title: Text("Messages", style: TextStyle(fontSize: 24, fontFamily: "Poppins-Semibold", color: AppColors().darkGreen),),
         actions: [
           IconButton(
               onPressed: (){},
