@@ -1,7 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../../database/firebase/authentication/authentication_helper.dart';
 import '../../theme/colors.dart';
 import '../../widgets/custom_text_field.dart';
@@ -26,8 +23,70 @@ class _SignupScreenState extends State<SignupScreen> {
   var isVisible = false;
 
   /// radio button default value -> Rahul
-  String accountType = "Landlord"; // Default account type
+  String accountType = "Renter";
   String? gender;
+
+  /// sign up function with firebase -> Rahul
+  Future<void> _signup() async {
+    // Validate if any field is empty
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passController.text.isEmpty ||
+        confirmPassController.text.isEmpty ||
+        gender == null) {
+      // Show a message to fill all required fields
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill all the required fields"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      // Check if password and confirm password match
+      if (passController.text == confirmPassController.text) {
+        // Attempt to sign up
+        final user = await _authService.signUp(
+          nameController.text.trim(),
+          emailController.text.trim(),
+          passController.text.trim(),
+          accountType,
+          gender!,
+        );
+
+        if (user != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Successfully Signed Up"),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          await Future.delayed(const Duration(seconds: 2));
+
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LoginScreen(),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Sign-up failed"),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Passwords do not match"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +206,7 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               Row(
                                 children: [
-                                  /// Landlord Radio button login -> Rahul
+                                  /// Landlord Radio button logic -> Rahul
                                   Radio(
                                     value: "Landlord",
                                     groupValue: accountType,
@@ -164,7 +223,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
                                   /// Tenant Radio button login -> Rahul
                                   Radio(
-                                      value: "Tenant",
+                                      value: "Renter",
                                       groupValue: accountType,
                                       onChanged: (value) {
                                         setState(() {
@@ -281,7 +340,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     ? Icons.visibility_outlined
                                     : Icons.visibility_off_outlined,
                               )),
-                          obscureText: isVisible,
+                          obscureText: !isVisible,
                         ),
                       ),
                       const SizedBox(
@@ -303,78 +362,14 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       // this sizedBox contains sign up button
                       SizedBox(
-                        width: 350,
-                        height: 50,
-                        child: FullWidthButton(
-                          text: "Sign Up",
-
+                          width: 350,
+                          height: 50,
                           ///-------------------------------signup---------------------------------
-                          /// Apply login for signup with firebase -> Rahul
-                          onPressed: () async {
-                            // Validate if any field is empty
-                            if (nameController.text.isEmpty ||
-                                emailController.text.isEmpty ||
-                                passController.text.isEmpty ||
-                                confirmPassController.text.isEmpty ||
-                                gender == null) {
-                              // Show a message to fill all required fields
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                      "Please fill all the required fields"),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            } else {
-                              // Check if password and confirm password match
-                              if (passController.text ==
-                                  confirmPassController.text) {
-                                // Attempt to sign up
-                                User? user = await _authService.signUp(
-                                  nameController.text,
-                                  emailController.text,
-                                  passController.text,
-                                  accountType,
-                                  gender!,
-                                );
-
-                                if (user != null) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Successfully Signed Up"),
-                                      backgroundColor: Colors.green,
-                                    ),
-                                  );
-
-                                  await Future.delayed(
-                                      const Duration(seconds: 2));
-
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const LoginScreen(),
-                                    ),
-                                  );
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text("Sign-up failed"),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text("Passwords do not match"),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            }
-                          },
-                        ),
-                      ),
+                          child: FullWidthButton(
+                            text: "Sign Up",
+                            /// Here we call _signup function -> Rahul
+                            onPressed: _signup,
+                          )),
                       const SizedBox(
                         height: 10,
                       ),

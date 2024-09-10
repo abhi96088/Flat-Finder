@@ -1,8 +1,8 @@
 import 'package:flat_finder/common/login_and_signup/signup_screen.dart';
+import 'package:flat_finder/database/firebase/authentication/authentication_helper.dart';
+import 'package:flat_finder/tenant/home_Screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import '../../tenant/bottom_navigation_tenant.dart';
 import '../../theme/colors.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/full_width_button.dart';
@@ -19,10 +19,62 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
+  bool isVisible = false;
+
+  /// firebase authService instance -> Rahul
+  AuthService authService = AuthService();
+
+  ///-------------------------------FUNCTION--------------------------------------------------------
+  /// create login function with firebase -> Rahul
+  Future<void> _login() async {
+    final email = emailController.text.trim();
+    final password = passController.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please fill all the blanks"),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+    final user = await authService.login(email, password);
+    if (user != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Successfully Logged In"),
+          backgroundColor: Colors.green,
+        ),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text("Create an account first"),
+          backgroundColor: Colors.red,
+          action: SnackBarAction(
+            label: 'Sign Up',
+            textColor: Colors.white,
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SignupScreen()),
+              );
+            },
+          ),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      ///-------------------------------BODY------------------------------------------
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -139,7 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(
                         width: 350,
                         child: CustomTextField(
-                            obscureText: true,
+                            obscureText: !isVisible,
                             label: "Enter Password",
                             textController: passController,
                             prefixIcon: Icon(
@@ -147,22 +199,24 @@ class _LoginScreenState extends State<LoginScreen> {
                               color: AppColors().green,
                             ),
                             suffixIcon: IconButton(
-                              onPressed: () {},
-                              icon: const Icon(Icons.visibility_off_outlined),
+                              /// apply password hide and unHide -> Rahul
+                              onPressed: () {
+                                setState(() {
+                                  isVisible = !isVisible;
+                                });
+                              },
+                              icon: isVisible
+                                  ? const Icon(Icons.visibility_off)
+                                  : const Icon(Icons.visibility_off_outlined),
                             )),
                       ),
                       const SizedBox(
                         height: 40,
                       ),
                       FullWidthButton(
-                          text: "Login",
-                          onPressed: () {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const BottomNavigationTenant()));
-                          }),
+                        text: "Login",
+                        onPressed: _login,
+                      ),
                       const SizedBox(
                         height: 40,
                       ),
