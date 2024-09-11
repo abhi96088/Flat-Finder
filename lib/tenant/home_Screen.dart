@@ -77,23 +77,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 10,),
                     // this sizedbox contains filter button
-                    SizedBox(
+                    Container(
                       width: 60,
                       height: 60,
-                      child: ElevatedButton(
-                          style: ButtonStyle(
-                            fixedSize: const WidgetStatePropertyAll(Size(40,40)),
-                            backgroundColor: WidgetStatePropertyAll(AppColors().green70),
-                            foregroundColor: WidgetStatePropertyAll(AppColors().blue),
-                            shape: WidgetStatePropertyAll(
-                                RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(40)
-                                )
-                            ),
-                          ),
-
+                      decoration: BoxDecoration(
+                        color: AppColors().green , 
+                        borderRadius: BorderRadius.circular(30)
+                      ),
+                      child: IconButton(
                           onPressed: (){},
-                          child: SvgPicture.asset("assets/icons/filter.svg", color: AppColors().blue, width: 40,height: 40,)
+                          icon:  SvgPicture.asset("assets/icons/filter.svg", color: AppColors().blue, height: 38, width: 38, fit: BoxFit.cover, ),
+
+
+
                       ),
                     ),
                   ],
