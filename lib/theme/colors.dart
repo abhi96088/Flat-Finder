@@ -6,6 +6,7 @@ class AppColors {
   final green70 = const Color(0xB30AF65A);
   final grey = const Color(0xFF999999);
   final blue = const Color(0xFF0779FF);
+  final blue50 = const Color(0x880779FF);
   final darkGrey = const Color(0xFF4F4F4F);
   final darkGreen = const Color(0xFF00473E);
 }
