@@ -196,43 +196,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           // this will contain all the card listed by user
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  // this row contains two card
-                  const Row(
-                    children: [
-                      CardSmallSqure(
-                          title: 'Need a Flatmate',
-                          rent: 'Rs-7500',
-                          desc: 'Need a  in flatmate in a luxury 2b . . .'
-                      ),
-                      CardSmallSqure(
-                          title: 'Need a Flatmate',
-                          rent: 'Rs-7500',
-                          desc: 'Need a  in flatmate in a luxury 2b . . .'
-                      )
-                    ],
-                  ),
-                  const Row(
-                    children: [
-                      CardSmallSqure(
-                          title: 'Need a Flatmate',
-                          rent: 'Rs-7500',
-                          desc: 'Need a  in flatmate in a luxury 2b . . .'
-                      ),
-                      CardSmallSqure(
-                          title: 'Need a Flatmate',
-                          rent: 'Rs-7500',
-                          desc: 'Need a  in flatmate in a luxury 2b . . .'
-                      )
-                    ],
-                  ),
-                  const SizedBox(height: 20,),
-                  Text("No more item to show", style: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 20, fontFamily: "Poppins-Medium"),)
-                ],
-              ),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                // this row contains two card
+                const Row(
+                  children: [
+                    CardSmallSqure(
+                        title: 'Need a Flatmate',
+                        rent: 'Rs-7500',
+                        desc: 'Need a  in flatmate in a luxury 2b . . .'
+                    ),
+                    CardSmallSqure(
+                        title: 'Need a Flatmate',
+                        rent: 'Rs-7500',
+                        desc: 'Need a  in flatmate in a luxury 2b . . .'
+                    )
+                  ],
+                ),
+                const SizedBox(height: 20,),
+                Text("No more item to show", style: TextStyle(color: Colors.grey.withOpacity(0.5), fontSize: 20, fontFamily: "Poppins-Medium"),)
+              ],
             ),
           )
         ],
