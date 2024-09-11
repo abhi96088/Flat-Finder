@@ -27,14 +27,14 @@ class _SignupScreenState extends State<SignupScreen> {
   String? gender;
 
   /// sign up function with firebase -> Rahul
+
+
   Future<void> _signup() async {
-    // Validate if any field is empty
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
         passController.text.isEmpty ||
         confirmPassController.text.isEmpty ||
         gender == null) {
-      // Show a message to fill all required fields
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please fill all the required fields"),
@@ -42,14 +42,12 @@ class _SignupScreenState extends State<SignupScreen> {
         ),
       );
     } else {
-      // Check if password and confirm password match
       if (passController.text == confirmPassController.text) {
-        // Attempt to sign up
         final user = await _authService.signUp(
           nameController.text.trim(),
           emailController.text.trim(),
           passController.text.trim(),
-          accountType,
+          accountType, // Store this in Firebase
           gender!,
         );
 
@@ -60,7 +58,6 @@ class _SignupScreenState extends State<SignupScreen> {
               backgroundColor: Colors.green,
             ),
           );
-
           await Future.delayed(const Duration(seconds: 2));
 
           Navigator.pushReplacement(
@@ -87,6 +84,7 @@ class _SignupScreenState extends State<SignupScreen> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

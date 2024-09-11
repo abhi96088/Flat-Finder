@@ -1,9 +1,9 @@
 import 'package:flat_finder/common/login_and_signup/signup_screen.dart';
 import 'package:flat_finder/database/firebase/authentication/authentication_helper.dart';
 import 'package:flat_finder/tenant/bottom_navigation_tenant.dart';
-import 'package:flat_finder/tenant/home_Screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../landlord/bottom_navigation_landlord.dart';
 import '../../theme/colors.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/full_width_button.dart';
@@ -27,6 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   ///-------------------------------FUNCTION--------------------------------------------------------
   /// create login function with firebase -> Rahul
+
   Future<void> _login() async {
     final email = emailController.text.trim();
     final password = passController.text.trim();
@@ -40,18 +41,32 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       return;
     }
+
     final user = await authService.login(email, password);
     if (user != null) {
+          final accountType = await authService.getAccountType(user.uid);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Successfully Logged In"),
           backgroundColor: Colors.green,
         ),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const BottomNavigationTenant()),
-      );
+
+      // Navigate to different screens based on account type
+      if (accountType == "Renter") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const BottomNavigationTenant()),
+        );
+      } else if (accountType == "Landlord") {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const BottomNavigationLandlord()),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -106,7 +121,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => SignupScreen()));
+                                  builder: (context) => const SignupScreen()));
                         },
                       ),
                     ),
