@@ -1,5 +1,6 @@
 import 'package:flat_finder/common/login_and_signup/signup_screen.dart';
 import 'package:flat_finder/database/firebase/authentication/authentication_helper.dart';
+import 'package:flat_finder/tenant/bottom_navigation_tenant.dart';
 import 'package:flat_finder/tenant/home_Screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const BottomNavigationTenant()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
