@@ -17,7 +17,7 @@ class _PgScreenState extends State<PgScreen> {
           return const CardLarge(
             title: 'Luxury Boys PG',
             rent: 'Rent - 8000',
-            desc: 'Luxury Pg with all facilities like Ac, Fridge, Wifi, R.O, Bed, Sofa and . . .',
+            desc: 'Luxury Pg with all facilities like Ac, Fridge, Wi . . .',
           );
         }
     );
