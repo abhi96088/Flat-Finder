@@ -35,7 +35,7 @@ class _SavedScreenState extends State<SavedScreen> {
             return const CardSmall(
               title: '2 BHK Flat',
               rent: 'RS-15000',
-              desc: 'Fully furnished 2bhk flat with Ac, Fridge, Wifi and . . .',
+              desc: 'Fully furnished 2bhk flat with Ac, Fr . . .',
             );
           }
       ),
