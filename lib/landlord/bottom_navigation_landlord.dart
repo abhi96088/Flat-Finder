@@ -1,4 +1,5 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flat_finder/common/add_screen.dart';
 import 'package:flat_finder/common/chat_screen.dart';
 import 'package:flat_finder/common/profile_screen.dart';
 import 'package:flat_finder/tenant/home_Screen.dart';
@@ -20,7 +21,7 @@ class _BottomNavigationLandlordState extends State<BottomNavigationLandlord> {
   // list of screen that is to be shown on the tap of each item
   final List<Widget> _screenList = [
     const ChatScreen(),
-    const Center(child: Text("Add")),
+    AddScreen(),
     const ProfileScreen(),
   ];
 

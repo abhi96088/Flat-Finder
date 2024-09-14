@@ -9,6 +9,8 @@ class CustomTextField extends StatefulWidget {
     this.suffixIcon,
     this.obscureText = false,
     required this.label,
+    this.labelColor = Colors.black,
+    this.labelSize = 12,
     required this.textController
 
   });
@@ -20,6 +22,10 @@ class CustomTextField extends StatefulWidget {
   final Widget? suffixIcon;
   final bool obscureText;
   final String label;
+  final Color labelColor;
+  final double labelSize;
+
+
   final TextEditingController textController;
 
 
@@ -35,6 +41,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       controller: widget.textController,
       decoration: InputDecoration(
           label: Text(widget.label),
+          labelStyle: TextStyle(color: widget.labelColor, fontSize: widget.labelSize),
           focusedBorder:OutlineInputBorder(
               borderRadius: BorderRadius.circular(widget.borderRadius),
               borderSide: BorderSide(

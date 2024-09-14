@@ -17,7 +17,7 @@ class _FlatScreenState extends State<FlatScreen> {
           return const CardLarge(
             title: '2 BHK Flat',
             rent: 'Rent - 15000',
-            desc: 'Fully furnished 2bhk flat with Ac, Fri . . .',
+            desc: 'Fully furnished 2bhk flat with Ac, Fri  . . .',
           );
         }
     );

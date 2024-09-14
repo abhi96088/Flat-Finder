@@ -1,4 +1,5 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:flat_finder/common/add_screen.dart';
 import 'package:flat_finder/common/chat_screen.dart';
 import 'package:flat_finder/common/profile_screen.dart';
 import 'package:flat_finder/tenant/home_Screen.dart';
@@ -21,7 +22,7 @@ class _BottomNavigationTenantState extends State<BottomNavigationTenant> {
   final List<Widget> _screenList = [
     const HomeScreen(),
     const ChatScreen(),
-    const Center(child: Text("Add")),
+    AddScreen(),
     const SavedScreen(),
     const ProfileScreen(),
   ];

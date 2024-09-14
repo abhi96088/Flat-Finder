@@ -29,7 +29,7 @@ class _FullWidthButtonState extends State<FullWidthButton> {
           backgroundColor: WidgetStatePropertyAll(AppColors().green),
           foregroundColor: const WidgetStatePropertyAll(Colors.white),
         ),
-        child: Text(widget.text,style: const TextStyle(fontSize: 18,fontFamily: 'Poppins-Semibold', letterSpacing: 2),),
+        child: Text(widget.text,style: const TextStyle(fontSize: 18,fontFamily: 'Poppins-Semibold', letterSpacing: 2, shadows: [Shadow(color: Colors.black87, blurRadius: 3, offset: Offset(1.0, 1.0))]),),
       ),
     );
   }

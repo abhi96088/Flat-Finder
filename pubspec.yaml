@@ -34,6 +34,12 @@ dependencies:
   flutter_svg: ^2.0.10+1
   # dependency of curved navigation bar
   curved_navigation_bar: ^1.0.6
+  # dependency for media picker
+  image_picker: ^0.8.5+3
+  video_player: ^2.6.1
+  multi_image_picker_plus: ^0.0.5
+  # dependency for date picker format
+  intl: ^0.17.0
 
 #  For firebase -> Rahul
   firebase_core: ^3.2.0
