@@ -1,5 +1,8 @@
 import 'dart:io';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flat_finder/common/profile_screen.dart';
 import 'package:flat_finder/theme/colors.dart';
 import 'package:flat_finder/widgets/custom_dropdown.dart';
 import 'package:flat_finder/widgets/custom_text_field.dart';
@@ -7,11 +10,10 @@ import 'package:flat_finder/widgets/full_width_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:uuid/uuid.dart'; // To generate unique file names
 
 class AddDetailsScreen extends StatefulWidget {
-  const AddDetailsScreen({super.key,
-  required this.imageFromAddScreen
-  });
+  const AddDetailsScreen({super.key, required this.imageFromAddScreen});
 
   final List<XFile>? imageFromAddScreen;
 
@@ -20,8 +22,7 @@ class AddDetailsScreen extends StatefulWidget {
 }
 
 class _AddDetailsScreenState extends State<AddDetailsScreen> {
-
-  ///////////////////////=> TEXT EDITING CONTROLLERS <=//////////////////////
+  // Text editing controllers
   final TextEditingController titleController = TextEditingController();
   final TextEditingController rentController = TextEditingController();
   final TextEditingController securityMoneyController = TextEditingController();
@@ -33,36 +34,34 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
-  // this function shows date picker and handle date selection
+  // Function to select date
   Future<void> _selectDate(BuildContext context) async {
-    // shows date picker dialog
     DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),  // sets the current date by default
-      firstDate: DateTime.now(),    // sets the minimum date that can be picked
-      lastDate: DateTime(2025),     // sets the maximum date that can be picked
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime(2025),
       builder: (context, child) {
-        // customize the theme of the date picker
         return Theme(
           data: ThemeData.light().copyWith(
             primaryColor: Colors.blue,
             hintColor: Colors.blue,
             colorScheme: const ColorScheme.light(primary: Colors.blue),
-            buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+            buttonTheme:
+                const ButtonThemeData(textTheme: ButtonTextTheme.primary),
           ),
-          child: child!,  // The date picker widget is passed to the child.
+          child: child!,
         );
       },
     );
-    // if the date is picked and not null, update the text field with the formated date
     if (picked != null) {
       setState(() {
-        _dateController.text = DateFormat('dd/MM/yyyy').format(picked);   // formats the date and update the controller
+        _dateController.text = DateFormat('dd/MM/yyyy').format(picked);
       });
     }
   }
 
-  // selected variable an list of property type
+  // Dropdown options and selected values
   String selectedPropertyValue = "1 BHK";
   List<String> propertyType = [
     "1 BHK",
@@ -71,60 +70,140 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
     "1 RK",
     "Studio",
     "Room",
-    "PG",
+    "PG"
   ];
-
-  // selected variable an list of no of bedrooms
   String selectedBedroomsValue = "1";
-  List<String> bedrooms = [
-    "1",
-    "2",
-    "3",
-  ];
-
-  // selected variable an list of no of bathrooms
+  List<String> bedrooms = ["1", "2", "3"];
   String selectedBathoomsValue = "1";
-  List<String> bathrooms = [
-    "1",
-    "2",
-    "3",
-  ];
-
-  // selected variable an list of furnishing status
+  List<String> bathrooms = ["1", "2", "3"];
   String selectedFurnishingStatusValue = "Furnished";
   List<String> furnishingStatus = [
     "Furnished",
     "Unfurnished",
-    "Semi Furnished",
+    "Semi Furnished"
   ];
-
-  // selected variable an list of who's allowed
   String selectedAllowedValue = "Anyone";
-  List<String> allowed = [
-    "Bachelors",
-    "Girls",
-    "Family",
-    "Anyone",
-  ];
-
-  // selected variable an list of floor no
+  List<String> allowed = ["Bachelors", "Girls", "Family", "Anyone"];
   String selectedFloorValue = "Ground";
-  List<String> floor = [
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "Ground",
+  List<String> floor = ["1", "2", "3", "4", "5", "Ground"];
 
-  ];
+  // Function to upload images to Firebase Storage
+  Future<List<String>> _uploadImages(List<XFile> images) async {
+    List<String> imageUrls = [];
+    final FirebaseStorage storage = FirebaseStorage.instance;
+    for (XFile image in images) {
+      String fileName = Uuid().v4(); // Generate a unique file name
+      Reference ref = storage.ref().child('property_images').child(fileName);
+      try {
+        await ref.putFile(File(image.path));
+        String downloadUrl = await ref.getDownloadURL();
+        imageUrls.add(downloadUrl);
+      } catch (e) {
+        print("Error uploading image: $e");
+      }
+    }
+    return imageUrls;
+  }
+
+  // Function to post property details
+  Future<void> _postDetails() async {
+    // Collect form data
+    String title = titleController.text;
+    String rent = rentController.text;
+    String securityMoney = securityMoneyController.text;
+    String electricityBill = electricityBillController.text;
+    String waterBill = waterBillController.text;
+    String cleaningBill = cleaningBillController.text;
+    String address = addressController.text;
+    String otherDetails = otherDetailsController.text;
+    String description = descriptionController.text;
+    String availableFrom = _dateController.text;
+
+    // Validate form data
+    if (title.isEmpty ||
+        rent.isEmpty ||
+        securityMoney.isEmpty ||
+        electricityBill.isEmpty ||
+        address.isEmpty ||
+        description.isEmpty ||
+        availableFrom.isEmpty ||
+        selectedPropertyValue == null ||
+        selectedBedroomsValue == null ||
+        selectedBathoomsValue == null ||
+        selectedFurnishingStatusValue == null ||
+        selectedAllowedValue == null ||
+        selectedFloorValue == null ||
+        widget.imageFromAddScreen == null ||
+        widget.imageFromAddScreen!.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill all the details") ,
+        ),
+
+      );
+
+      return;
+    }
+
+    // Get current user's UID
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+
+    // Upload images and get their URLs
+    List<String> imageUrls = await _uploadImages(widget.imageFromAddScreen!);
+
+    // Prepare property details
+    Map<String, dynamic> propertyDetails = {
+      'title': title,
+      'rent': rent,
+      'securityMoney': securityMoney,
+      'electricityBill': electricityBill,
+      'waterBill': waterBill,
+      'cleaningBill': cleaningBill,
+      'address': address,
+      'otherDetails': otherDetails,
+      'description': description,
+      'availableFrom': availableFrom,
+      'propertyType': selectedPropertyValue,
+      'bedrooms': selectedBedroomsValue,
+      'bathrooms': selectedBathoomsValue,
+      'furnishingStatus': selectedFurnishingStatusValue,
+      'allowed': selectedAllowedValue,
+      'floor': selectedFloorValue,
+      'imageUrls': imageUrls,
+      'userId': uid,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    // Store property details in Firestore
+    try {
+      await FirebaseFirestore.instance
+          .collection('properties')
+          .add(propertyDetails);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Property details posted successfully')),
+      );
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())) ;
+    } catch (e) {
+      print("Error posting details: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to post property details')),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppColors().green,
-        title: Text("Include some details", style: TextStyle(color: AppColors().darkGreen, fontSize: 20, fontFamily: "Poppins-Medium"),),
+        backgroundColor: Colors.grey.shade300,
+        title: Text(
+          "Include some details",
+          style: TextStyle(
+              color: AppColors().darkGreen,
+              fontSize: 20,
+              fontFamily: "Poppins-Medium"),
+        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -132,214 +211,209 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
             padding: const EdgeInsets.all(10.0),
             child: Column(
               children: [
-                // this row contains the image and title field
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  // below container contains the first selected image by user which will be used as the cover image everywhere
-                  Container(
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(15)
+                  children: [
+                    Container(
+                      width: 150,
+                      height: 150,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      clipBehavior: Clip.hardEdge,
+                      child: Image.file(
+                          File(widget.imageFromAddScreen![0].path),
+                          fit: BoxFit.cover),
                     ),
-                    clipBehavior: Clip.hardEdge,    // ensure that image respects the border radius
-                    child: Image.file(File(widget.imageFromAddScreen![0].path), fit: BoxFit.cover,),
-                  ),
-                  const Spacer(),
-                  // this contains title field
-                  SizedBox(
-                    width: 220,
+                    const Spacer(),
+                    SizedBox(
+                      width: 220,
+                      child: TextField(
+                        controller: titleController,
+                        decoration: const InputDecoration(
+                          hintText: "Title*",
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                CustomDropdown(
+                  options: propertyType,
+                  selectedValue: selectedPropertyValue,
+                  label: "Select Type*",
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedPropertyValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                /// bedRoom
+                CustomDropdown(
+                  options: bedrooms,
+                  selectedValue: selectedBedroomsValue,
+                  label: "Bedrooms*",
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedBedroomsValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                /// bathroom
+                CustomDropdown(
+                  options: bathrooms,
+                  selectedValue: selectedBathoomsValue,
+                  label: "Bathrooms*",
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedBathoomsValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                /// Furnishing Status
+                CustomDropdown(
+                  options: furnishingStatus,
+                  selectedValue: selectedFurnishingStatusValue,
+                  label: "Furnishing Status*",
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedFurnishingStatusValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                /// Allowed
+                CustomDropdown(
+                  options: allowed,
+                  selectedValue: selectedAllowedValue,
+                  label: "Who's Allowed*",
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedAllowedValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                /// floors
+                CustomDropdown(
+                  options: floor,
+                  selectedValue: selectedFloorValue,
+                  label: "Floor*",
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      selectedFloorValue = newValue!;
+                    });
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                /// date picker
+                GestureDetector(
+                  onTap: () => _selectDate(context),
+                  child: AbsorbPointer(
                     child: TextField(
-                      controller: titleController,
-                      decoration: const InputDecoration(
-                        hintText: "Title*"
+                      controller: _dateController,
+                      decoration: InputDecoration(
+                        hintText: "Available From",
+                        filled: true,
+                        fillColor:Colors.grey.shade300,
+                        border: const OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        suffixIcon: const Icon(Icons.calendar_today),
                       ),
                     ),
                   ),
-                  ],
-                ),
-                const SizedBox(height: 15,),
-                // Select property type dropdown
-                CustomDropdown(
-                    options: propertyType,
-                    selectedValue: selectedPropertyValue,
-                    label: "Select Type*",
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedPropertyValue = newValue!;  // Update selected value
-                      });
-                    }
                 ),
                 const SizedBox(height: 10,),
-                // select bedrooms dropdown
-                CustomDropdown(
-                    options: bedrooms,
-                    selectedValue: selectedBedroomsValue,
-                    label: "Bedrooms*",
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedBedroomsValue = newValue!;  // Update selected value
-                      });
-                    }
-                ),
-                const SizedBox(height: 10,),
-                // select bathrooms dropdown
-                CustomDropdown(
-                    options: bathrooms,
-                    selectedValue: selectedBathoomsValue,
-                    label: "Bathrooms*",
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedBathoomsValue = newValue!;  // Update selected value
-                      });
-                    }
-                ),
-                const SizedBox(height: 10,),
-                // select furnishing status dropdown
-                CustomDropdown(
-                    options: furnishingStatus,
-                    selectedValue: selectedFurnishingStatusValue,
-                    label: "Furnishing Status*",
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedFurnishingStatusValue = newValue!;  // Update selected value
-                      });
-                    }
-                ),
-                const SizedBox(height: 10,),
-                // select who's allowed dropdown
-                CustomDropdown(
-                    options: allowed,
-                    selectedValue: selectedAllowedValue,
-                    label: "Who's Allowed*",
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedAllowedValue = newValue!;  // Update selected value
-                      });
-                    }
-                ),
-                const SizedBox(height: 10,),
-                // select floor no dropdown
-                CustomDropdown(
-                    options: floor,
-                    selectedValue: selectedFloorValue,
-                    label: "Floor No*",
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedFloorValue = newValue!;  // Update selected value
-                      });
-                    }
-                ),
-                const SizedBox(height: 10,),
-                // select available from (date picker)
-                TextFormField(
-                  controller: _dateController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: Colors.grey[300], // Background color like previous design
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(11), // Rounded corners
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    labelText: 'Available From*',
-                    labelStyle: TextStyle(fontSize: 18, color: AppColors().darkGrey),
-                    suffixIcon: const Icon(Icons.calendar_month),
-                  ),
-                  readOnly: true,   // makes the textField non-editable. it only opens the date picker
-                  onTap: () => _selectDate(context), // Opens date picker
-                ),
-                const SizedBox(height: 10,),
-                // select rent textField
-                CustomTextField(
-                  label: "Rent*",
-                  textController: rentController,
-                  enabledColor: AppColors().darkGrey,
-                  labelColor: AppColors().darkGrey,
-                  labelSize: 18,
-                ),
-                const SizedBox(height: 10,),
-                // select security money textField
-                CustomTextField(
-                  label: "Security Money",
-                  textController: securityMoneyController,
-                  enabledColor: AppColors().darkGrey,
-                  labelColor: AppColors().darkGrey,
-                  labelSize: 18,
-                ),
-                const SizedBox(height: 10,),
-                // select electricity bill textField
-                CustomTextField(
-                  label: "Electricity Bill",
-                  textController: electricityBillController,
-                  enabledColor: AppColors().darkGrey,
-                  labelColor: AppColors().darkGrey,
-                  labelSize: 18,
-                ),
-                const SizedBox(height: 10,),
-                // select water bill textField
-                CustomTextField(
-                  label: "Water Bill",
-                  textController: waterBillController,
-                  enabledColor: AppColors().darkGrey,
-                  labelColor: AppColors().darkGrey,
-                  labelSize: 18,
-                ),
-                const SizedBox(height: 10,),
-                // select cleaning bill textField
-                CustomTextField(
-                  label: "Cleaning",
-                  textController: cleaningBillController,
-                  enabledColor: AppColors().darkGrey,
-                  labelColor: AppColors().darkGrey,
-                  labelSize: 18,
-                ),
-                const SizedBox(height: 10,),
-                // select address textField
-                CustomTextField(
-                  label: "Address*",
-                  textController: addressController,
-                  enabledColor: AppColors().darkGrey,
-                  labelColor: AppColors().darkGrey,
-                  labelSize: 18,
-                ),
-                const SizedBox(height: 10,),
-                // select other details textField
-                CustomTextField(
-                  label: "Any Other Details or Restrictions",
-                  textController: otherDetailsController,
-                  enabledColor: AppColors().darkGrey,
-                  labelColor: AppColors().darkGrey,
-                  labelSize: 18,
-                ),
-                const SizedBox(height: 10,),
-                // select description textField
-                Container(
-                  height: 100,
-                  alignment: Alignment.centerLeft,
-                  child: TextField(
-                    minLines: 1,
-                    maxLines: 10,
-                    controller: descriptionController,
-                    decoration: const InputDecoration(
-                      hintText: "Description",
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16),
-                    ),
 
-                  ),
+                /// rent
+                CustomTextField(
+                  textController: rentController,
+                  label: "Rent",
                 ),
+                const SizedBox(
+                  height: 10,
+                ),
+
+                /// security Money
+                CustomTextField(
+                  textController: securityMoneyController,
+                  label: "Security Money",
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+
+                /// Electricity Bill
+                CustomTextField(
+                  textController: electricityBillController,
+                  label: "Electricity Bill",
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+
+                /// water bill
+                CustomTextField(
+                  textController: waterBillController,
+                  label: "Water Bill",
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+
+                /// cleaning bill
+                CustomTextField(
+                  textController: cleaningBillController,
+                  label: "Cleaning Bill",
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+
+                /// Address
+                CustomTextField(
+                  textController: addressController,
+                  label: "Address*",
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                CustomTextField(
+                  textController: otherDetailsController,
+                  label: "Other Details",
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                TextField(
+                  controller: descriptionController,
+                  minLines: 2,
+                  maxLines: 10,
+                  decoration: const InputDecoration(hintText: "Description*"),
+                ),
+
+                const SizedBox(height: 15),
+
+                /// post button ---------------------------------------
                 FullWidthButton(
-                    text: "Post Now",
-                    onPressed: (){}   // post all data in database and show user that your property is listed successfully and then reflect it on their profile
+                  onPressed: _postDetails,
+                  text: 'Post Details',
                 ),
-                const SizedBox(height: 10,),
-          
               ],
             ),
           ),
         ),
-      )
+      ),
     );
   }
 }
