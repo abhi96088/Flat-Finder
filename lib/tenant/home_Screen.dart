@@ -1,6 +1,8 @@
 import 'package:flat_finder/tenant/flat_screen.dart';
 import 'package:flat_finder/tenant/flatmate_screen.dart';
 import 'package:flat_finder/tenant/pg_screen.dart';
+import 'package:flat_finder/tenant/search_screen.dart';
+import 'package:flat_finder/widgets/filter_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
@@ -33,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return SafeArea(
       child: Scaffold(
-
         body: Column(
           children: [
             // this widget contains appbar
@@ -70,13 +71,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const Spacer(),
                     // this sizedbox contains search icon
-                    SizedBox(
-                        width: 45,
-                        height: 45,
-                        child: SvgPicture.asset('assets/icons/search.svg')
+                    IconButton(
+                        onPressed: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+                        },
+                        icon: SvgPicture.asset('assets/icons/search.svg',width: 40,height: 40,)
                     ),
                     const SizedBox(width: 10,),
-                    // this sizedbox contains filter button
+                    // this sizedBox contains filter button
                     Container(
                       width: 60,
                       height: 60,
@@ -85,7 +87,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         borderRadius: BorderRadius.circular(30)
                       ),
                       child: IconButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            showDialog(
+                                context: context,
+                                builder: (context) => const FilterDrawer()
+                            );
+                          },
                           icon:  SvgPicture.asset("assets/icons/filter.svg", color: AppColors().blue, height: 38, width: 38, fit: BoxFit.cover, ),
 
 

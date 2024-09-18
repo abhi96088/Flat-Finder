@@ -7,11 +7,13 @@ import 'package:flat_finder/common/login_and_signup/signup_screen.dart';
 import 'package:flat_finder/common/splace_screen.dart';
 import 'package:flat_finder/landlord/bottom_navigation_landlord.dart';
 import 'package:flat_finder/tenant/bottom_navigation_tenant.dart';
+import 'package:flat_finder/tenant/detail_view_screen.dart';
 import 'package:flat_finder/tenant/flat_screen.dart';
 import 'package:flat_finder/tenant/home_Screen.dart';
 import 'package:flat_finder/tenant/search_screen.dart';
 import 'package:flat_finder/theme/colors.dart';
 import 'package:flat_finder/widgets/card_large.dart';
+import 'package:flat_finder/widgets/filter_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -37,7 +39,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const BottomNavigationLandlord()
+      home: const HomeScreen()
     );
   }
 }

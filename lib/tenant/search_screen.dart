@@ -1,3 +1,4 @@
+import 'package:flat_finder/widgets/filter_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -124,7 +125,12 @@ class _SearchScreenState extends State<SearchScreen> {
                       width: 100,
                       height: 55,
                       child: ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => const FilterDrawer()
+                          );
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors().blue,
                           shape: RoundedRectangleBorder(
