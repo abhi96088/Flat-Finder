@@ -136,7 +136,7 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
         widget.imageFromAddScreen == null ||
         widget.imageFromAddScreen!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Please fill all the details") ,
+        const SnackBar(content: Text("Please fill all the details") ,
         ),
 
       );
@@ -173,7 +173,7 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
       'timestamp': FieldValue.serverTimestamp(),
     };
 
-    // Store property details in Firestore
+    // Store property details in FireStore
     try {
       await FirebaseFirestore.instance
           .collection('properties')
@@ -328,7 +328,7 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
                         border: const OutlineInputBorder(
                           borderSide: BorderSide.none,
                         ),
-                        suffixIcon: const Icon(Icons.calendar_today),
+                        suffixIcon: const Icon(Icons.calendar_month),
                       ),
                     ),
                   ),

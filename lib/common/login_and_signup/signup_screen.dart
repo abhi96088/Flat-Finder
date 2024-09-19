@@ -208,6 +208,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   Radio(
                                     value: "Landlord",
                                     groupValue: accountType,
+                                    activeColor: AppColors().blue,
                                     onChanged: (value) {
                                       setState(() {
                                         accountType = value!;
@@ -223,6 +224,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   Radio(
                                       value: "Renter",
                                       groupValue: accountType,
+                                      activeColor: AppColors().blue,
                                       onChanged: (value) {
                                         setState(() {
                                           accountType = value!;
@@ -249,6 +251,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   Radio(
                                       value: "Male",
                                       groupValue: gender,
+                                      activeColor: AppColors().blue,
                                       onChanged: (value) {
                                         setState(() {
                                           gender = value!;
@@ -263,6 +266,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   Radio(
                                       value: "Female",
                                       groupValue: gender,
+                                      activeColor: AppColors().blue,
                                       onChanged: (value) {
                                         setState(() {
                                           gender = value!;
@@ -277,6 +281,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                   Radio(
                                       value: "Other",
                                       groupValue: gender,
+                                      activeColor: AppColors().blue,
                                       onChanged: (value) {
                                         setState(() {
                                           gender = value!;

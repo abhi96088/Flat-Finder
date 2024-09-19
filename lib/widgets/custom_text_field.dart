@@ -40,7 +40,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
       obscureText: widget.obscureText,
       controller: widget.textController,
       decoration: InputDecoration(
-          label: Text(widget.label),
+          label: Text(widget.label, style: const TextStyle(fontSize: 18),),
           labelStyle: TextStyle(color: widget.labelColor, fontSize: widget.labelSize),
           focusedBorder:OutlineInputBorder(
               borderRadius: BorderRadius.circular(widget.borderRadius),

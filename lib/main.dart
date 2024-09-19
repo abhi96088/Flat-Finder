@@ -14,7 +14,9 @@ import 'package:flat_finder/tenant/home_Screen.dart';
 import 'package:flat_finder/tenant/search_screen.dart';
 import 'package:flat_finder/theme/colors.dart';
 import 'package:flat_finder/widgets/card_large.dart';
+import 'package:flat_finder/widgets/edit_profile_screen.dart';
 import 'package:flat_finder/widgets/filter_drawer.dart';
+import 'package:flat_finder/widgets/profile_navigation_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -41,7 +43,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: SplaceScreen( )
+      home: const ProfileScreen()
     );
   }
 }

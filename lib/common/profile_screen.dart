@@ -1,5 +1,7 @@
 import 'package:flat_finder/theme/colors.dart';
 import 'package:flat_finder/widgets/card_small_squre.dart';
+import 'package:flat_finder/widgets/edit_profile_screen.dart';
+import 'package:flat_finder/widgets/profile_navigation_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -13,15 +15,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        drawer: const ProfileNavigationDrawer(),
         body: SingleChildScrollView(
-      child: Column(
-        children: [
+          child: Column(
+            children: [
           // Profile picture, navigation drawer button, and share button
-          SizedBox(
-            width: double.maxFinite,
-            child: Stack(alignment: Alignment.center, children: [
+            SizedBox(
+              width: double.maxFinite,
+              child: Stack(alignment: Alignment.center, children: [
               // Profile picture
-              Padding(
+                Padding(
                   padding: const EdgeInsets.only(top: 80),
                   child: ClipOval(
                     child: Image.asset(
@@ -31,10 +34,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 200,
                     ),
                   )),
-              Positioned(
-                bottom: 10,
-                right: 115,
-                child: CircleAvatar(
+                Positioned(
+                  bottom: 10,
+                  right: 115,
+                  child: CircleAvatar(
                   minRadius: 10,
                   child: IconButton(
                       onPressed: () {},
@@ -42,22 +45,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Icons.edit,
                         color: AppColors().blue,
                       )),
+                  ),
                 ),
-              ),
               // Menu icon for navigation drawer
-              Positioned(
+                Positioned(
                   top: 40,
                   left: 5,
-                  child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.menu_rounded,
-                      color: AppColors().green,
-                      size: 45,
-                    ),
-                  )),
+                  child: Builder(
+                    builder: (context) {
+                      return IconButton(
+                        onPressed: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                        icon: Icon(
+                          Icons.menu_rounded,
+                          color: AppColors().green,
+                          size: 45,
+                        ),
+                      );
+                    }
+                  )
+                ),
               // Share button
-              Positioned(
+                Positioned(
                   top: 45,
                   right: 5,
                   child: IconButton(
@@ -67,24 +77,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       color: AppColors().green,
                       size: 43,
                     ),
-                  )),
-            ]),
+                  )
+                ),
+              ]
+            ),
           ),
-          const SizedBox(height: 10),
-          const Text(
+            const SizedBox(height: 10),
+            const Text(
             "Abhimanyu Kumar",
             style: TextStyle(fontFamily: "Poppins-Bold", fontSize: 25),
           ),
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
           // Edit profile button
-          SizedBox(
-            width: 160,
-            height: 45,
-            child: ElevatedButton(
+            SizedBox(
+             width: 160,
+              height: 45,
+              child: ElevatedButton(
                 style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.all(AppColors().green),
                 ),
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const EditProfileScreen()));
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -101,10 +118,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 )),
           ),
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
 
-          /// ---- Card for email and phone number  ----
-          Padding(
+            /// ---- Card for email and phone number  ----
+            Padding(
             padding: const EdgeInsets.only(left: 10.0, right: 10.0),
             child: SizedBox(
               height: 100,
@@ -236,9 +253,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 10),
+            const SizedBox(height: 10),
           // Green bar with list icon and "My Listing" title
-          Container(
+            Container(
             width: double.maxFinite,
             height: 40,
             color: AppColors().green,
@@ -262,14 +279,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ],
             ),
           ),
-          GridView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-            ),
-            itemCount: 10, // Replace with actual item count
-            itemBuilder: (context, index) {
+              ),
+              itemCount: 10, // Replace with actual item count
+              itemBuilder: (context, index) {
               return const CardSmallSqure(
                 title: 'Need a Flatmate',
                 rent: 'Rs-7500',
