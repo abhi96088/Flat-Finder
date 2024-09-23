@@ -6,13 +6,15 @@ import '../theme/colors.dart';
 class CardSmallSqure extends StatefulWidget {
   const CardSmallSqure({super.key,
 
+    required this.imagePath,
     required this.title,
     required this.rent,
     required this.desc,
-    this.location = "Garden Colony, Kharar"
+    required this.location
 
   });
-
+  /// here we add image path -> Rahul
+  final String imagePath ;
   final String title;
   final String rent;
   final String desc;
@@ -37,12 +39,12 @@ class _CardSmallSqureState extends State<CardSmallSqure> {
               // this container contains image
               Container(
                 width: double.maxFinite,
-                height: 100,
+                height: 130,
                 decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15))
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: Image.asset("assets/images/flat_image.jpg", width: double.maxFinite, fit: BoxFit.cover,),
+                child: Image.network(widget.imagePath, width: double.maxFinite, fit: BoxFit.cover,),
               ),
               // this widget contains all the Title and text below the image
               Padding(
