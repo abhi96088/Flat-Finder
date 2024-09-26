@@ -1,9 +1,47 @@
+import 'dart:io';
+
 import 'package:flat_finder/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 
 class DetailViewScreen extends StatefulWidget {
-  const DetailViewScreen({super.key});
+  const DetailViewScreen({super.key,
+    required this.media,
+    required this.title,
+    required this.location,
+    required this.rent,
+    required this.dp,
+    required this.desc,
+    required this.type,
+    required this.bedroom,
+    required this.bathroom,
+    required this.furnishingStatus,
+    required this.allowed,
+    required this.floor,
+    this.electricity = "Free",
+    this.water = "Free",
+    this.cleaning = "Free",
+    required this.availability
+
+  });
+
+  final List<XFile> ? media;
+  final String title;
+  final String location;
+  final String rent;
+  final String dp;
+  final String desc;
+  final String type;
+  final String bedroom;
+  final String bathroom;
+  final String furnishingStatus;
+  final String allowed;
+  final String floor;
+  final String electricity;
+  final String water;
+  final String cleaning;
+  final String availability;
 
   @override
   State<DetailViewScreen> createState() => _DetailViewScreenState();
@@ -27,8 +65,8 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                       child: Stack(
                         alignment: Alignment.center,
                           children:[
-                            // there will be the list of images and videos uploaded by landLord
-                            Image.asset("assets/images/flat_image.jpg", fit: BoxFit.cover,),
+                            /// there will be the list of images and videos uploaded by landLord
+                            Image.file(File(widget.media![0].path), fit: BoxFit.cover,),
                             Positioned(
                                 right: 10,
                                 top: 10,
@@ -45,7 +83,7 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                                 left: -25,
                                 child: IconButton(
                                     onPressed: (){},
-                                    icon: Icon(Icons.chevron_left_rounded, size: 80,)
+                                    icon: const Icon(Icons.chevron_left_rounded, size: 80,)
                                 )
                             ),
                             // increment index of images list when pressed on this button
@@ -54,7 +92,7 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                                 right: -25,
                                 child: IconButton(
                                     onPressed: (){},
-                                    icon: Icon(Icons.chevron_right_rounded, size: 80,)
+                                    icon: const Icon(Icons.chevron_right_rounded, size: 80,)
                                 )
                             ),
                             // triple dot which indicates there is more images
@@ -63,7 +101,7 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                                 bottom: -25,
                                 child: IconButton(
                                     onPressed: (){},
-                                    icon: Icon(Icons.more_horiz_outlined, size: 80,)
+                                    icon: const Icon(Icons.more_horiz_outlined, size: 80,)
                                 )
                             )
                         ]
@@ -72,24 +110,24 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                   // this text widget holds title of the listed property
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text("2 BHK fully furnished flat available", style: TextStyle(fontSize: 30, color: AppColors().darkGreen, fontFamily: "Poppins-Semibold"),),
+                    child: Text(widget.title, style: TextStyle(fontSize: 30, color: AppColors().darkGreen, fontFamily: "Poppins-Semibold"),),
                   ),
                   Row(
                     children: [
                       SvgPicture.asset("assets/icons/location_outlined.svg", width: 15,height: 25,),
                       const SizedBox(width: 7,),
-                      Text("New Garden Colony, Kharar", style: TextStyle(color: AppColors().darkGrey, fontFamily: "Poppins-Semibold"),),
+                      Text(widget.location, style: TextStyle(color: AppColors().darkGrey, fontFamily: "Poppins-Semibold"),),
                       const Spacer(),
-                      const Text("Rent - ₹15000")
+                      Text("Rent - ₹${widget.rent}")
                     ],
                   ),
                   const Divider(thickness: 2,),
                   // profile, name and view profile button of landlord
                   Row(
                     children: [
-                      const CircleAvatar(
+                      CircleAvatar(
                         radius: 30,
-                        backgroundImage: AssetImage("assets/images/dp.jpg"),
+                        backgroundImage: AssetImage(widget.dp),
                       ),
                       const SizedBox(width: 10,),
                       Text("Abhimanyu Kumar", style: TextStyle(color: AppColors().darkGreen, fontFamily: "Poppins-Semibold", fontSize: 16),),
@@ -114,14 +152,12 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                   const Divider(thickness: 2,),
                   Text("Details", style: TextStyle(color: AppColors().darkGreen, fontSize: 25, fontFamily: "Poppins-Semibold"),),
                   // description text is here, there is 3-4 visible lines of description text and rest of the lines will appear when user will click on See more...
-                  Text("Fully furnished 2bhk flat with AC, Fridge, Wifi, R.O, Bed, Almirah and all other facilities fully independent "
-                      "couple friendly, no restriction.Condition - You have to submit id proof and a security money of 5000 rupees which "
-                      "is refundable . . . . . . See more", style: TextStyle(color: AppColors().darkGrey, fontFamily: "Poppins_Regular"),),
+                  Text(widget.desc, style: TextStyle(color: AppColors().darkGrey, fontFamily: "Poppins_Regular"),),
                   const SizedBox(height: 10,),
                   // all other details
-                  const Row(
+                  Row(
                     children: [
-                      Column(
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text("TYPE"),
@@ -139,16 +175,16 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("    : 2bhk"),
-                          Text("    : 2"),
-                          Text("    : 2"),
-                          Text("    : Furnished"),
-                          Text("    : Bachelors"),
-                          Text("    : 2"),
-                          Text("    : 8₹/Unit"),
-                          Text("    : 100₹"),
-                          Text("    : 100₹"),
-                          Text("    : 18/10/2024"),
+                          Text("    : ${widget.type}"),
+                          Text("    : ${widget.bedroom}"),
+                          Text("    : ${widget.bathroom}"),
+                          Text("    : ${widget.furnishingStatus}"),
+                          Text("    : ${widget.allowed}"),
+                          Text("    : ${widget.floor}"),
+                          Text("    : ${widget.electricity}"),
+                          Text("    : ${widget.water}"),
+                          Text("    : ${widget.cleaning}"),
+                          Text("    : ${widget.availability}"),
                         ],
                       )
                     ],
