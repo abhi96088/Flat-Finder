@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flat_finder/widgets/card_large.dart';
 import 'package:flutter/material.dart';
 
@@ -9,17 +10,48 @@ class FlatScreen extends StatefulWidget {
 }
 
 class _FlatScreenState extends State<FlatScreen> {
+  /// FireStore instance to access the properties collection -> Rahul
+  final CollectionReference propertiesRef = FirebaseFirestore.instance.collection('properties');
+
+  /// Data list to hold the property documents -> Rahul
+  List<DocumentSnapshot> userListings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProperties(); /// Fetch properties on initialization -> Rahul
+  }
+
+  /// Function to fetch property listings from FireStore -> Rahul
+  Future<void> fetchProperties() async {
+    try {
+      QuerySnapshot snapshot = await propertiesRef.get();
+      setState(() {
+        userListings = snapshot.docs; // Store fetched documents
+      });
+    } catch (e) {
+      print('Error fetching properties: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-        itemCount: 10,
-        itemBuilder: (context, index){
-          return const CardLarge(
-            title: '2 BHK Flat',
-            rent: 'Rent - 15000',
-            desc: 'Fully furnished 2bhk flat with Ac, Fri  . . .',
+    return Scaffold(
+      body: userListings.isEmpty
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.builder(
+        itemCount: userListings.length,
+        itemBuilder: (context, index) {
+          var listing = userListings[index].data() as Map<String, dynamic>;
+          return CardLarge(
+            title: listing['title'],
+            rent: 'Rent - ${listing['rent']}',
+            desc: '${listing['description']}',
+            location: listing['address'],
+            imageUrl: listing['imageUrls'][0],
           );
-        }
+        },
+      ),
     );
   }
 }

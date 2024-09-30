@@ -17,7 +17,7 @@ class _FlatmateScreenState extends State<FlatmateScreen> {
           return const CardLarge(
             title: 'Need a Flatmate',
             rent: 'Rent - 7500',
-            desc: 'Need a  in flatmate in a luxury 2 bhk flat one room i . . .',
+            desc: 'Need a  in flatmate in a luxury 2 bhk flat one room i . . .', location: '', imageUrl: '',
           );
         }
     );
