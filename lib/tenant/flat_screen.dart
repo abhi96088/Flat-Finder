@@ -57,30 +57,37 @@ class _FlatScreenState extends State<FlatScreen> {
                 context,
                 MaterialPageRoute(
                   builder: (context) => DetailViewScreen(
-                    media: mediaFiles, // Pass the list of XFile
-                    title: listing['title'], // Correct key for title
+                    media: mediaFiles,
+                    title: listing['title'],
                     location: listing['address'],
-                    rent: listing['rent'].toString(), // Convert rent to string if necessary
-                    dp: XFile(listing['imageUrls'][0]), // Use XFile for display picture
-                    desc: listing['otherDetails'] ?? 'No description available', // Correct key for description
+                    rent: listing['rent'].toString(),
+                    dp: XFile(listing['imageUrls'][0]),
+                    desc: listing['otherDetails'] ?? 'No description available',
                     type: listing['propertyType'],
-                    bedroom: listing['bedrooms'].toString(), // Convert to string if necessary
-                    bathroom: listing['bathrooms'].toString(), // Convert to string if necessary
-                    furnishingStatus: listing['furnishingStatus'], // Correct key for furnishing status
-                    allowed: listing['allowed'], // Correct key for allowed
-                    floor: listing['floor'].toString(), // Convert to string if necessary
+                    bedroom: listing['bedrooms'].toString(),
+                    bathroom: listing['bathrooms'].toString(),
+                    furnishingStatus: listing['furnishingStatus'],
+                    allowed: listing['allowed'],
+                    floor: listing['floor'].toString(),
                     availability: listing['availableFrom'],
+                    electricity: listing['electricityBill'] ?? "000",
+                    cleaning:  listing['cleaningBill'] ?? "000",
+                    water:  listing['waterBill'] ?? "000",
+                    securityBill:  listing['securityMoney'] ?? "000",
+
+
 
                   ),
                 ),
               );
             },
             child: CardLarge(
-              title: listing['title'], // Correct key for title
-              rent: 'Rent - ${listing['rent']}', // Correct key for rent
-              desc: listing['otherDetails'] ?? 'No description available', // Correct key for description
-              location: listing['address'], // Correct key for location
-              imageUrl: listing['imageUrls'][0], // Assuming first image in the list
+              title: listing['title'],
+              rent: 'Rent - ${listing['rent']}',
+              desc: listing['otherDetails'] ?? 'No description available',
+              location: listing['address'],
+              imageUrl: listing['imageUrls'][0],
+
             ),
           );
         },
