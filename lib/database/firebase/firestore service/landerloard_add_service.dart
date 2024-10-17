@@ -1,51 +1,61 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-class LanderLoardAddService {
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+class DetailViewScreen extends StatelessWidget {
+  final String media;
+  final String title;
+  final String location;
+  final String rent;
+  final String dp;
+  final String desc;
+  final String type;
+  final int bedroom;
+  final int bathroom;
+  final String furnishingStatus;
+  final String allowed;
+  final int floor;
+  final String availability;
 
-  Future<void> uploadPropertyDetails({
-    required String title,
-    required String propertyType,
-    required String bedrooms,
-    required String bathrooms,
-    required String furnishingStatus,
-    required String allowed,
-    required String floor,
-    required String availableFrom,
-    required String rent,
-    String? securityMoney,
-    String? electricityBill,
-    String? waterBill,
-    String? cleaningBill,
-    required String address,
-    String? otherDetails,
-    required List<String> imageUrls,
-    required String userId, // Add userId parameter
-  }) async {
-    try {
-      await _db.collection('properties').add({
-        'title': title,
-        'propertyType': propertyType,
-        'bedrooms': bedrooms,
-        'bathrooms': bathrooms,
-        'furnishingStatus': furnishingStatus,
-        'allowed': allowed,
-        'floor': floor,
-        'availableFrom': availableFrom,
-        'rent': rent,
-        'securityMoney': securityMoney,
-        'electricityBill': electricityBill,
-        'waterBill': waterBill,
-        'cleaningBill': cleaningBill,
-        'address': address,
-        'otherDetails': otherDetails,
-        'imageUrls': imageUrls, // List of image URLs
-        'userId': userId, // Store user ID
-        'timestamp': FieldValue.serverTimestamp(),
-      });
-      print("Data uploaded successfully!");
-    } catch (e) {
-      print("Failed to upload data: $e");
-    }
+
+  const DetailViewScreen({
+    super.key,
+    required this.media,
+    required this.title,
+    required this.location,
+    required this.rent,
+    required this.dp,
+    required this.desc,
+    required this.type,
+    required this.bedroom,
+    required this.bathroom,
+    required this.furnishingStatus,
+    required this.allowed,
+    required this.floor,
+    required this.availability,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Image.network(dp), // Load the image using the URL
+            Text('Rent: $rent'),
+            Text('Location: $location'),
+            Text('Bedrooms: $bedroom'),
+            Text('Bathrooms: $bathroom'),
+            Text('Furnishing Status: $furnishingStatus'),
+            Text('Allowed: $allowed'),
+            Text('Floor: $floor'),
+            Text('Availability: $availability'),
+            Text('Description: $desc'),
+          ],
+        ),
+      ),
+    );
   }
 }

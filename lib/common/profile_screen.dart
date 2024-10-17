@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flat_finder/tenant/detail_view_screen.dart';
 import 'package:flat_finder/widgets/card_small_squre.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
 import '../theme/colors.dart';
 import '../widgets/edit_profile_screen.dart';
 import '../widgets/profile_navigation_drawer.dart';
@@ -337,20 +337,22 @@ class _UserProfileScreenState extends State<ProfileScreen> {
               itemCount: userListings.length,
               itemBuilder: (context, index) {
                 var listing = userListings[index];
-                return CardSmallSqure(
-                  title: listing['title'],
+                return InkWell(
+                  child: CardSmallSqure(
+                    title: listing['title'],
 
-                  /// done
-                  rent: listing['rent'].toString(),
+                    /// done
+                    rent: listing['rent'].toString(),
 
-                  /// done
-                  desc: listing['description'],
+                    /// done
+                    desc: listing['description'],
 
-                  /// done
-                  imagePath: listing['imageUrls'][0],
-                  location: listing['address'],
+                    /// done
+                    imagePath: listing['imageUrls'][0],
+                    location: listing['address'],
 
-                  /// done
+                    /// done
+                  ),
                 );
               },
             ),
