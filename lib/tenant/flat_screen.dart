@@ -82,9 +82,10 @@ class _FlatScreenState extends State<FlatScreen> {
               );
             },
             child: CardLarge(
+              propertyId: listing['propertyId'],
               title: listing['title'],
               rent: 'Rent - ${listing['rent']}',
-              desc: listing['otherDetails'] ?? 'No description available',
+              desc: listing['description'] ?? 'No description available',
               location: listing['address'],
               imageUrl: listing['imageUrls'][0],
 

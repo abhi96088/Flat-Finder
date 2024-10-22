@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:flat_finder/common/chat_screen.dart';
+import 'package:flat_finder/landlord/bottom_navigation_landlord.dart';
+import 'package:flat_finder/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
@@ -62,11 +65,21 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
     selectedImage = widget.media[0];
   }
 
+  ///  --------------------------- here we use media query -------------------------------///
+  MediaQueryData? mqData ;
   @override
   Widget build(BuildContext context) {
+    mqData = MediaQuery.of(context) ;
     return Scaffold(
       appBar: AppBar(
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: MyIconButton(mIcon: Icons.arrow_back_ios_rounded, onPress: (){
+            Navigator.pop(context);
+          }),
+        ),
         title: Text(widget.title),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         child: Center(
@@ -87,15 +100,16 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
 
             /// ------------------------ GRID VIEW IMAGE ---------------------///
             SizedBox(
-              height: 80,
+              height: mqData!.size.height*0.11,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                padding: const EdgeInsets.symmetric(vertical: 12.0),
                 child: GridView.builder(
-                  physics: const NeverScrollableScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    childAspectRatio: 3 / 2,
+                    crossAxisCount: 1,
+                    childAspectRatio: 3 / 3,
                     crossAxisSpacing: 11,
+                    mainAxisSpacing: 11
                   ),
                   itemCount: widget.media.length,
                   itemBuilder: (context, index) {
@@ -110,7 +124,7 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(16),
                           boxShadow: selectedImage == widget.media[index]
-                              ? [BoxShadow(color: Colors.black, blurRadius: 3)]
+                              ? [const BoxShadow(color: Colors.black, blurRadius: 3)]
                               : null,
                           border: Border.all(
                             color: selectedImage == widget.media[index]
@@ -269,6 +283,7 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                     child: OutlinedButton(
                       onPressed: () {
                         // Redirect user to the landlord's chat screen
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
                       },
                       style: ButtonStyle(
                         shape: WidgetStateProperty.all(RoundedRectangleBorder(
@@ -300,10 +315,10 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                       },
                       style: ButtonStyle(
                         backgroundColor:
-                            MaterialStateProperty.all(AppColors().blue),
-                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            WidgetStateProperty.all(AppColors().blue),
+                        shape: WidgetStateProperty.all(RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(11))),
-                        side: MaterialStateProperty.all(
+                        side: WidgetStateProperty.all(
                             BorderSide(color: AppColors().darkBlue, width: 2)),
                       ),
                       child: FittedBox(

@@ -4,6 +4,7 @@ import 'package:flat_finder/tenant/detail_view_screen.dart';
 import 'package:flat_finder/widgets/card_small_squre.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import '../theme/colors.dart';
 import '../widgets/edit_profile_screen.dart';
 import '../widgets/profile_navigation_drawer.dart';
@@ -16,7 +17,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<ProfileScreen> {
-
   /// ------------------ firebase initialize -- rahul----------
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -30,7 +30,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
     fetchUserListings();
   }
 
-  // Function to fetch user properties based on userId
+  ///   ----------------Function to fetch user properties based on userId ----------------------------///
   Future<void> fetchUserListings() async {
     try {
       String? userId = _auth.currentUser?.uid;
@@ -50,12 +50,13 @@ class _UserProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  MediaQueryData? mqData ;
   @override
   Widget build(BuildContext context) {
+    mqData = MediaQuery.of(context) ;
     return Scaffold(
       /// -------------- here call Drawer -----------------///
       drawer: const ProfileNavigationDrawer(),
-
       /// ------------------body-------------------------///
       body: SingleChildScrollView(
         child: Column(
@@ -121,8 +122,8 @@ class _UserProfileScreenState extends State<ProfileScreen> {
               ]),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Abhimanyu Kumar",
+            /// -------------------------------------- user name --------------------------------///
+            const Text("Abhimanyu Kumar",
               style: TextStyle(fontFamily: "Poppins-Bold", fontSize: 25),
             ),
             const SizedBox(height: 10),
@@ -338,6 +339,38 @@ class _UserProfileScreenState extends State<ProfileScreen> {
               itemBuilder: (context, index) {
                 var listing = userListings[index];
                 return InkWell(
+                  onTap: () {
+                    ///------------------------ Convert image URLs to XFile-----------------------///
+                    List<XFile> mediaFiles =
+                        (listing['imageUrls'] as List<dynamic>)
+                            .map((url) => XFile(url))
+                            .toList();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DetailViewScreen(
+                                  media: mediaFiles,
+                                  title: listing['title'],
+                                  location: listing['address'],
+                                  rent: listing['rent'].toString(),
+                                  dp: XFile(listing['imageUrls'][0]),
+                                  desc: listing['otherDetails'] ??
+                                      'No description available',
+                                  type: listing['propertyType'],
+                                  bedroom: listing['bedrooms'].toString(),
+                                  bathroom: listing['bathrooms'].toString(),
+                                  furnishingStatus: listing['furnishingStatus'],
+                                  allowed: listing['allowed'],
+                                  floor: listing['floor'].toString(),
+                                  availability: listing['availableFrom'],
+                                  electricity:
+                                      listing['electricityBill'] ?? "000",
+                                  cleaning: listing['cleaningBill'] ?? "000",
+                                  water: listing['waterBill'] ?? "000",
+                                  securityBill:
+                                      listing['securityMoney'] ?? "000",
+                                )));
+                  },
                   child: CardSmallSqure(
                     title: listing['title'],
 

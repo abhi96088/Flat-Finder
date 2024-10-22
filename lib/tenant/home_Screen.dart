@@ -6,10 +6,11 @@ import 'package:flat_finder/widgets/filter_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../theme/colors.dart';
-
-
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,91 +20,118 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  String currentLocation = "location...";
+  String localLocation = "location...";
 
   @override
   void initState() {
-        super.initState();
+    super.initState();
+    _checkPermissions();
   }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
-        statusBarColor: AppColors().green,
-          statusBarIconBrightness: Brightness.light
-      ),
+          statusBarColor: AppColors().green,
+          statusBarIconBrightness: Brightness.light),
     );
-
     return SafeArea(
       child: Scaffold(
         body: Column(
           children: [
-            // this widget contains appbar
+            // AppBar section
             SizedBox(
               width: double.infinity,
               height: 80,
               child: Padding(
                 padding: const EdgeInsets.only(left: 10, right: 10),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    // this sizedbox contains location icon
+                    // Location icon
                     SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: SvgPicture.asset('assets/icons/location.svg')
-                    ),
-                    // this widget contains Address
-                    const Padding(
-                      padding: EdgeInsets.only(left: 5, top: 8),
+                        width: 30,
+                        height: 30,
+                        child: SvgPicture.asset('assets/icons/location.svg')),
+                    // Address section
+                    Padding(
+                      padding: const EdgeInsets.only(left: 5, top: 8),
                       child: SizedBox(
                         width: 170,
                         height: 80,
                         child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
-                                children:[
-                                  Text("Kharar", style: TextStyle(fontSize: 24, color: Colors.black, fontFamily: 'Poppins-Bold'),),
-                                  Icon(Icons.keyboard_arrow_down_sharp, size: 40,)
-                                ]),
-                            Text("New Garden Colony", style: TextStyle(fontSize: 16, color: Colors.black, fontFamily: 'Poppins-Semibold'),),
+                              children: [
+                                /// current local fetch
+                                Text(
+                                  currentLocation,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins-Bold',
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Text(
+                              localLocation,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.black,
+                                fontFamily: 'Poppins-Semibold',
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
-                    const Spacer(),
-                    // this sizedbox contains search icon
+                    Spacer(),
+                    // search button
                     IconButton(
-                        onPressed: (){
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => const SearchScreen()));
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const SearchScreen()));
                         },
-                        icon: SvgPicture.asset('assets/icons/search.svg',width: 40,height: 40,)
+                        icon: SvgPicture.asset(
+                          'assets/icons/search.svg',
+                          width: 30,
+                          height: 30,
+                        )),
+                    const SizedBox(
+                      width: 10,
                     ),
-                    const SizedBox(width: 10,),
-                    // this sizedBox contains filter button
+                    // --------------------- Filter button ------------------ ///
                     Container(
-                      width: 60,
-                      height: 60,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
-                        color: AppColors().green , 
-                        borderRadius: BorderRadius.circular(30)
-                      ),
+                          color: AppColors().green,
+                          borderRadius: BorderRadius.circular(30)),
                       child: IconButton(
-                          onPressed: (){
-                            showDialog(
-                                context: context,
-                                builder: (context) => const FilterDrawer()
-                            );
-                          },
-                          icon:  SvgPicture.asset("assets/icons/filter.svg", color: AppColors().blue, height: 38, width: 38, fit: BoxFit.cover, ),
-
-
-
+                        onPressed: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) => const FilterDrawer());
+                        },
+                        icon: SvgPicture.asset(
+                          "assets/icons/filter.svg",
+                          color: AppColors().blue,
+                          height: 30,
+                          width: 30,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
             ),
-            // this widget contains rest of the screen
+            // Tab section
             Expanded(
               child: DefaultTabController(
                 length: 3,
@@ -117,32 +145,36 @@ class _HomeScreenState extends State<HomeScreen> {
                         indicator: BoxDecoration(
                           color: AppColors().blue,
                           borderRadius: BorderRadius.circular(11),
-                          border: Border.all(width: 2, color: Colors.amberAccent),
+                          border:
+                              Border.all(width: 2, color: Colors.amberAccent),
                         ),
                         indicatorSize: TabBarIndicatorSize.label,
                         dividerHeight: 0,
                         labelPadding: const EdgeInsets.only(left: 5, right: 5),
                         tabs: [
-                          // this is the first tab "Flat"
+                          // Flat tab
                           Tab(
                             child: Container(
                               height: double.maxFinite,
                               decoration: tabButtonStyle(),
                               alignment: Alignment.center,
-                              // this row contains Icon and text of the first tab
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: SvgPicture.asset("assets/icons/flat.svg", height: 30, width: 30,),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: SvgPicture.asset(
+                                      "assets/icons/flat.svg",
+                                      height: 30,
+                                      width: 30,
                                     ),
-                                    const Text("Flat"),
-                                  ],
-                                ),
+                                  ),
+                                  const Text("Flat"),
+                                ],
+                              ),
                             ),
                           ),
-                          // this is the second tab "PG"
+                          // PG tab
                           Tab(
                             child: Container(
                               height: double.maxFinite,
@@ -150,17 +182,21 @@ class _HomeScreenState extends State<HomeScreen> {
                               alignment: Alignment.center,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: SvgPicture.asset("assets/icons/pg.svg",  height: 30, width: 30,),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: SvgPicture.asset(
+                                      "assets/icons/pg.svg",
+                                      height: 30,
+                                      width: 30,
                                     ),
-                                    const Text("PG"),
-                                  ],
-                                ),
+                                  ),
+                                  const Text("PG"),
+                                ],
+                              ),
                             ),
                           ),
-                          // this is third tab "Flatmate"
+                          // Flatmate tab
                           Tab(
                             child: Container(
                               height: double.maxFinite,
@@ -168,24 +204,29 @@ class _HomeScreenState extends State<HomeScreen> {
                               alignment: Alignment.center,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(5.0),
-                                      child: SvgPicture.asset("assets/icons/flatmate.svg",  height: 30, width: 30,),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: SvgPicture.asset(
+                                      "assets/icons/flatmate.svg",
+                                      height: 30,
+                                      width: 30,
                                     ),
-                                    const Text("Flatmate"),
-                                  ],
-                                ),
+                                  ),
+                                  const Text("Flatmate"),
+                                ],
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const Expanded(
+                    // TabView to show the contents of each tab
+                    Expanded(
                       child: TabBarView(
                         children: [
-                          FlatScreen(),
-                          PgScreen(),
+                          const FlatScreen(),
+                          const PgScreen(),
                           FlatmateScreen(),
                         ],
                       ),
@@ -194,21 +235,80 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             )
-
-
-
           ],
         ),
-        
       ),
     );
   }
+
+  /// ---------------------------------------------- FUNCTION --------------------------------------///
 // function used to style tab button
-  static tabButtonStyle(){
+  static BoxDecoration tabButtonStyle() {
     return BoxDecoration(
       color: Colors.transparent, // Unselected background
       borderRadius: BorderRadius.circular(11),
       border: Border.all(width: 2, color: AppColors().green),
     );
+  }
+
+  // Function to check location permissions and get the user's location
+  Future<void> _checkPermissions() async {
+    final status = await Permission.location.request();
+    if (status.isGranted) {
+      await _getAreaLocation();
+      await _getStateLocation();
+    } else {
+      setState(() {
+        currentLocation = "Location permission is denied.";
+      });
+    }
+  }
+
+  // Function to get the user's area (locality) based on coordinates
+  Future<void> _getAreaLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark place = placemarks[0];
+      String location = "${place.locality}";
+      setState(() {
+        currentLocation = location;
+      });
+    } catch (e) {
+      setState(() {
+        currentLocation = "location: ${e.toString()}";
+      });
+    }
+  }
+
+  // Function to get the user's state based on coordinates
+  Future<void> _getStateLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      Placemark place = placemarks[0];
+      String location = "${place.street}";
+      setState(() {
+        localLocation = location;
+      });
+    } catch (e) {
+      setState(() {
+        localLocation = "Failed to get location: ${e.toString()}";
+      });
+    }
   }
 }
