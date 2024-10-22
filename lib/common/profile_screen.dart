@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_finder/tenant/detail_view_screen.dart';
@@ -24,10 +26,52 @@ class _UserProfileScreenState extends State<ProfileScreen> {
   /// data get list
   List<DocumentSnapshot> userListings = [];
 
+  String? selectedGender;
+  File? _profileImage;
+  final picker = ImagePicker();
+  final user = FirebaseAuth.instance.currentUser;
+
+  /// ---------------------- Variable to hold the profile image URL -------------- ///
+  String? _profileImageUrl;
+  String userName = "username";
+  String gender = "gender";
+  String email = "email";
+  String number = "number";
+  String dob = "dob";
+  String profession = "profession";
+
+  // Loading state variable
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
     fetchUserListings();
+    _fetchUserProfile();
+  }
+
+  Future<void> _fetchUserProfile() async {
+    if (user != null) {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(user!.uid).get();
+
+      if (userDoc.exists) {
+        // Ensure null safety for each field
+        setState(() {
+          userName = userDoc['name'];
+          email = userDoc['email'];
+          number = userDoc['phone'];
+          gender = userDoc['gender'];
+          dob = userDoc['dob'];
+          profession = userDoc['profession'];
+
+          /// ----------- Check if profileImageUrl exists and set profile image
+          if (userDoc.get('profileImageUrl') != null) {
+            _profileImageUrl = userDoc.get('profileImageUrl');
+          }
+        });
+      }
+    }
   }
 
   ///   ----------------Function to fetch user properties based on userId ----------------------------///
@@ -50,13 +94,14 @@ class _UserProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  MediaQueryData? mqData ;
+  MediaQueryData? mqData;
   @override
   Widget build(BuildContext context) {
-    mqData = MediaQuery.of(context) ;
+    mqData = MediaQuery.of(context);
     return Scaffold(
       /// -------------- here call Drawer -----------------///
       drawer: const ProfileNavigationDrawer(),
+
       /// ------------------body-------------------------///
       body: SingleChildScrollView(
         child: Column(
@@ -71,26 +116,28 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                 Padding(
                     padding: const EdgeInsets.only(top: 80),
                     child: ClipOval(
-                      child: Image.asset(
-                        "assets/images/dp.jpg",
-                        fit: BoxFit.cover,
-                        width: 200,
-                        height: 200,
-                      ),
+                      child: _profileImage != null
+                          ? Image.file(
+                              _profileImage!,
+                              fit: BoxFit.cover,
+                              width: 200,
+                              height: 200,
+                            )
+                          : (_profileImageUrl != null
+                              ? Image.network(
+                                  _profileImageUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 200,
+                                  height: 200,
+                                )
+                              : Image.asset(
+                                  "assets/icons/user (2).png",
+                                  fit: BoxFit.cover,
+                                  width: 200,
+                                  height: 200,
+                                )),
                     )),
-                Positioned(
-                  bottom: 10,
-                  right: 115,
-                  child: CircleAvatar(
-                    minRadius: 10,
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.edit,
-                          color: AppColors().blue,
-                        )),
-                  ),
-                ),
+
                 // Menu icon for navigation drawer
                 Positioned(
                     top: 40,
@@ -122,9 +169,11 @@ class _UserProfileScreenState extends State<ProfileScreen> {
               ]),
             ),
             const SizedBox(height: 10),
+
             /// -------------------------------------- user name --------------------------------///
-            const Text("Abhimanyu Kumar",
-              style: TextStyle(fontFamily: "Poppins-Bold", fontSize: 25),
+            Text(
+              userName,
+              style: const TextStyle(fontFamily: "Poppins-Bold", fontSize: 25),
             ),
             const SizedBox(height: 10),
             // Edit profile button
@@ -163,7 +212,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10.0),
               child: SizedBox(
-                height: 100,
+                height: mqData!.size.height * 0.13,
                 child: Card(
                   color: Colors.blueAccent.withOpacity(0.2),
                   child: Padding(
@@ -176,6 +225,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                             // email, phone number
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Row(
                                   children: [
@@ -195,7 +245,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                                   ],
                                 ),
                                 Text(
-                                  "abhimanyukumar2464@gmail.com",
+                                  email,
                                   style: TextStyle(
                                       color: AppColors().darkGrey,
                                       fontSize: 12),
@@ -221,7 +271,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                                   width: 5,
                                 ),
                                 Text(
-                                  "+91 9608893754",
+                                  number,
                                   style: TextStyle(color: AppColors().darkGrey),
                                 )
                               ],
@@ -291,6 +341,125 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Container(
+                width: double.infinity,
+                height: mqData!.size.height * 0.16,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 2, color: Colors.blueAccent),
+                  color: Colors.deepPurpleAccent.shade100,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ///------------------ profession ------------------///
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: Card(
+                          color: Colors.yellowAccent.shade100,
+                          shadowColor: Colors.black,
+                          elevation: 4,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Profession",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: "Poppins-Medium"),
+                                ),
+                                Text(
+                                  profession,
+                                  style: TextStyle(color: AppColors().darkGrey),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// ------------------ Dob-of-birth -----------------///
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: Card(
+                          color: Colors.yellowAccent.shade100,
+                          shadowColor: Colors.black,
+                          elevation: 4,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Dob-of-birth",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: "Poppins-Medium"),
+                                ),
+                                Text(
+                                  dob,
+                                  style: TextStyle(color: AppColors().darkGrey),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// ------------------- Gender -----------------------///
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: Card(
+                          color: Colors.yellowAccent.shade100,
+                          shadowColor: Colors.black,
+                          elevation: 4,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Gender",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: "Poppins-Medium"),
+                                ),
+                                Text(
+                                  gender,
+                                  style: TextStyle(color: AppColors().darkGrey),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

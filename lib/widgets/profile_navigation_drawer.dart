@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_finder/theme/colors.dart';
@@ -14,7 +16,12 @@ class _NavigationDrawerState extends State<ProfileNavigationDrawer> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // Variable to hold the profile image URL
+  String? _profileImageUrl;
+  File? _profileImage;
   String userName = "Loading..."; // Default value
+  String email = "Loading..."; // Default value
 
   @override
   void initState() {
@@ -30,9 +37,15 @@ class _NavigationDrawerState extends State<ProfileNavigationDrawer> {
       await _firestore.collection('users').doc(user.uid).get();
       setState(() {
         userName = userDoc['name'];
+        email = userDoc['email'];
+
+        if (userDoc.get('profileImageUrl') != null) {
+          _profileImageUrl = userDoc.get('profileImageUrl');
+        }
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return NavigationDrawer(backgroundColor: AppColors().blue, children: [
@@ -40,9 +53,31 @@ class _NavigationDrawerState extends State<ProfileNavigationDrawer> {
         children: [
           const SizedBox(height: 20,),
           /// ----> Profile picture of the user <---- ///
-          const CircleAvatar(
-            radius: 80,
-            backgroundImage: AssetImage("assets/images/dp.jpg"),
+          SizedBox(
+            width: 200,
+            height: 200,
+            child: ClipOval(
+              child: _profileImage != null
+                  ? Image.file(
+                _profileImage!,
+                fit: BoxFit.cover,
+                width: 200,
+                height: 200,
+              )
+                  : (_profileImageUrl != null
+                  ? Image.network(
+                _profileImageUrl!,
+                fit: BoxFit.cover,
+                width: 200,
+                height: 200,
+              )
+                  : Image.asset(
+                "assets/icons/user (2).png",
+                fit: BoxFit.cover,
+                width: 200,
+                height: 200,
+              )),
+            ),
           ),
           const SizedBox(
             height: 20,
@@ -53,6 +88,14 @@ class _NavigationDrawerState extends State<ProfileNavigationDrawer> {
             userName,
             style: const TextStyle(
                 fontSize: 25,
+                fontFamily: "Poppins-Semibold",
+                color: Colors.white),
+          ),
+           /// ----------email------------------///
+           Text(
+            email,
+            style: const TextStyle(
+                fontSize: 14,
                 fontFamily: "Poppins-Semibold",
                 color: Colors.white),
           ),
@@ -248,7 +291,7 @@ class _NavigationDrawerState extends State<ProfileNavigationDrawer> {
             ),
           ),
           const SizedBox(
-            height: 120,
+            height: 70,
           ),
 
           /// ----> Logout Button <---- ///
