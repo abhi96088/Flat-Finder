@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_finder/common/about_screen.dart';
+import 'package:flat_finder/common/help_and_support_screen.dart';
 import 'package:flat_finder/theme/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -237,12 +238,17 @@ class _NavigationDrawerState extends State<ProfileNavigationDrawer> {
                       const SizedBox(
                         width: 10,
                       ),
-                      const Text(
-                        "Help & Support",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontFamily: "Poppins-Semibold"),
+                      InkWell(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => const HelpAndSupportScreen()));
+                        },
+                        child: const Text(
+                          "Help & Support",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 22,
+                              fontFamily: "Poppins-Semibold"),
+                        ),
                       ),
                       const Spacer(),
                       const Icon(
