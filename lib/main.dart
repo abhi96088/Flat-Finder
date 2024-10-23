@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flat_finder/common/about_screen.dart';
 import 'package:flat_finder/common/add_details_screen.dart';
 import 'package:flat_finder/common/add_screen.dart';
 import 'package:flat_finder/common/chat_screen.dart';
@@ -43,7 +44,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: const LoginScreen()
+      home: const SplaceScreen()
     );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flat_finder/common/about_screen.dart';
 import 'package:flat_finder/theme/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -260,6 +261,7 @@ class _NavigationDrawerState extends State<ProfileNavigationDrawer> {
                 InkWell(
                   onTap: () {
                     /// --------> Navigate to About Screen <-------- ///
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => AboutScreen()));
                   },
                   child: Row(
                     children: [

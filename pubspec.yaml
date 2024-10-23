@@ -39,7 +39,7 @@ dependencies:
   video_player: ^2.6.1
   multi_image_picker_plus: ^0.0.5
   # dependency for date picker format
-  intl: ^0.17.0
+  intl: ^0.18.1
   uuid: ^3.0.6
 
 #  For firebase -> Rahul
@@ -54,6 +54,18 @@ dependencies:
   geocoding: ^2.0.5
   permission_handler: ^10.0.0
   google_maps_flutter: ^2.2.0
+
+    #  app share
+  share_plus: ^10.0.0 # Latest version
+
+    #  Dash Chat package use for chat ui create easily
+  dash_chat_2: 0.0.16
+  http: ^1.2.1
+
+    #  redirect on other app and website
+  url_launcher: ^6.1.7
+  external_app_launcher: ^4.0.0
+
 
 
 

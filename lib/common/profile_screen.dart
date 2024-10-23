@@ -5,8 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flat_finder/tenant/detail_view_screen.dart';
 import 'package:flat_finder/widgets/card_small_squre.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import '../theme/colors.dart';
 import '../widgets/edit_profile_screen.dart';
 import '../widgets/profile_navigation_drawer.dart';
@@ -97,6 +99,10 @@ class _UserProfileScreenState extends State<ProfileScreen> {
   MediaQueryData? mqData;
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+            statusBarColor: AppColors().green,
+            statusBarIconBrightness: Brightness.light));
     mqData = MediaQuery.of(context);
     return Scaffold(
       /// -------------- here call Drawer -----------------///
@@ -159,7 +165,12 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                     top: 45,
                     right: 5,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Share.share(
+                          'Check out this amazing app: https://play.google.com/store/apps/details?id=com.yourapp.package',
+                          subject: 'Flat Finder',
+                        );
+                      },
                       icon: Icon(
                         Icons.share_outlined,
                         color: AppColors().green,

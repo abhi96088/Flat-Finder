@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flat_finder/common/chat_screen.dart';
 import 'package:flat_finder/landlord/bottom_navigation_landlord.dart';
+import 'package:flat_finder/tenant/bottom_navigation_tenant.dart';
 import 'package:flat_finder/widgets/my_icon_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -283,7 +284,7 @@ class _DetailViewScreenState extends State<DetailViewScreen> {
                     child: OutlinedButton(
                       onPressed: () {
                         // Redirect user to the landlord's chat screen
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen()));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigationTenant(selectedIndex: 1,)));
                       },
                       style: ButtonStyle(
                         shape: WidgetStateProperty.all(RoundedRectangleBorder(
