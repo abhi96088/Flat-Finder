@@ -1,101 +1,129 @@
-
-import 'dart:core';
-
-import 'package:flat_finder/theme/colors.dart';
+import 'dart:convert';
+import 'package:dash_chat_2/dash_chat_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+
+import '../theme/colors.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
 
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  State<StatefulWidget> createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  final String ourUri =
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=AIzaSyC4t-_GkGdB3my0vfn0wxaiOhbzbfKinOE';
 
-  // List of images to be shown as dp of chats
-  List<Image>images = [
-    Image.asset("assets/images/model 4.jpg"),
-    Image.asset("assets/images/model 5.jpg"),
-    Image.asset("assets/images/model 2.jpeg"),
-    Image.asset("assets/images/model 7.jpg"),
-    Image.asset("assets/images/model1.jpeg"),
-    Image.asset("assets/images/model 6.jpg"),
-    Image.asset("assets/images/model 3.jpeg"),
-    Image.asset("assets/images/model 9.jpg"),
-    Image.asset("assets/images/model 8.jpg"),
-  ];
+  final Map<String, String> header = {
+    'Content-Type': 'application/json',
+  };
 
-  // List to be shown as name of chats
-  List<String> names = [
-    "Aarav",
-    "Aditya",
-    "Sanya",
-    "Arjun",
-    "Meera",
-    "Ishaan",
-    "Nisha",
-    "Rohan",
-    "Pooja",
+  // User type message
+  final ChatUser mySelf = ChatUser(
+    id: "1",
+    firstName: "my Self",
+  );
 
-  ];
+  // Bot type message
+  final ChatUser bot = ChatUser(
+    id: "2",
+    firstName: "Flat finder",
+  );
 
-  // List to be shown as message in chats
-  List<String>messages = [
-    "Hi, are we still on for today?",
-    "Can you send me the details again?",
-    "I'm running late, but I'll be there.",
-    "Thanks for the update!",
-    "Just checking in. How's it going?",
-    "Let's reschedule for next week.",
-    "Do you need help with that?",
-    "I'm here. Where are you?",
-    "Sorry, I missed your call. Can we talk later?"
-  ];
+  List<ChatMessage> messages = [];
+  List<ChatUser> _typing = [];
 
-  List<String>messageTiming = [
-    "10:30 PM",
-    "3:15 PM",
-    "Yesterday",
-    "Yesterday",
-    "2d",
-    "Sept 4",
-    "Aug 29",
-    "Aug 12",
-    "July 27",
-  ];
+  Future<void> getData(ChatMessage m) async {
+    _typing.add(bot);
+    messages.insert(0, m);
+    setState(() {});
+
+    var data = {
+      "contents": [
+        {
+          "parts": [
+            {"text": m.text}
+          ]
+        }
+      ]
+    };
+
+    try {
+      final response = await http.post(
+        Uri.parse(ourUri),
+        headers: header,
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 200) {
+        var result = jsonDecode(response.body);
+        print("Response: $result");
+
+        if (result != null && result.containsKey('candidates')) {
+          String botResponseText =
+          result['candidates'][0]['content']['parts'][0]['text'];
+
+          ChatMessage botMessage = ChatMessage(
+            text: botResponseText,
+            user: bot,
+            createdAt: DateTime.now(),
+          );
+          messages.insert(0, botMessage);
+          setState(() {});
+        } else {
+          print("Unexpected response structure: $result");
+        }
+      } else {
+        print("Error: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error: $e");
+    } finally {
+      _typing.remove(bot);
+      setState(() {});
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+            statusBarColor: AppColors().green,
+            statusBarIconBrightness: Brightness.light));
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors().green,
-        title: Text("Messages", style: TextStyle(fontSize: 24, fontFamily: "Poppins-Semibold", color: AppColors().darkGreen),),
-        actions: [
-          IconButton(
-              onPressed: (){},
-              icon: Icon(Icons.search_rounded, size: 30, color: AppColors().darkGreen,)
+
+      body: Padding(
+        padding: const EdgeInsets.only(bottom: 28.0),
+        child: DashChat(
+          typingUsers: _typing,
+          currentUser: mySelf,
+          onSend: (ChatMessage m) {
+            getData(m);
+          },
+          messages: messages,
+          inputOptions: const InputOptions(
+            alwaysShowSend: true,
+            autocorrect: true,
+            inputTextStyle: TextStyle(fontSize: 20),
+            cursorStyle: CursorStyle(color: Colors.redAccent),
           ),
-          IconButton(
-              onPressed: (){}, 
-              icon: Icon(Icons.more_vert_rounded, size: 30,color: AppColors().darkGreen,)
-          )
-        ],
-      ),
-      body: ListView.builder(
-        itemCount: names.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            leading: CircleAvatar(
-              backgroundImage: images[index].image,
-              radius: 25,
+          messageOptions: MessageOptions(
+            currentUserContainerColor: Colors.blue,
+            showTime: true,
+            avatarBuilder: (user, onAvatarTap, onAvatarLongPress) => Center(
+              child: Image.asset(
+                "assets/images/logo.png",
+                height: 40,
+                width: 40,
+              ),
             ),
-            title: Text(names[index], style: const TextStyle(fontSize: 16, fontFamily: "Poppins-Semibold")),
-            subtitle: Text(messages[index], style: const TextStyle(fontSize: 14, color: Colors.grey)),
-            trailing: Text(messageTiming[index], style: const TextStyle(fontSize: 12, color: Colors.grey)),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
 }
+

@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flat_finder/tenant/detail_view_screen.dart';
 import 'package:flat_finder/widgets/card_small_squre.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-
+import 'package:image_picker/image_picker.dart';
+import 'package:share_plus/share_plus.dart';
 import '../theme/colors.dart';
 import '../widgets/edit_profile_screen.dart';
 import '../widgets/profile_navigation_drawer.dart';
@@ -16,7 +21,6 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _UserProfileScreenState extends State<ProfileScreen> {
-
   /// ------------------ firebase initialize -- rahul----------
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -24,13 +28,55 @@ class _UserProfileScreenState extends State<ProfileScreen> {
   /// data get list
   List<DocumentSnapshot> userListings = [];
 
+  String? selectedGender;
+  File? _profileImage;
+  final picker = ImagePicker();
+  final user = FirebaseAuth.instance.currentUser;
+
+  /// ---------------------- Variable to hold the profile image URL -------------- ///
+  String? _profileImageUrl;
+  String userName = "username";
+  String gender = "gender";
+  String email = "email";
+  String number = "number";
+  String dob = "dob";
+  String profession = "profession";
+
+  // Loading state variable
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
     fetchUserListings();
+    _fetchUserProfile();
   }
 
-  // Function to fetch user properties based on userId
+  Future<void> _fetchUserProfile() async {
+    if (user != null) {
+      DocumentSnapshot userDoc =
+          await _firestore.collection('users').doc(user!.uid).get();
+
+      if (userDoc.exists) {
+        // Ensure null safety for each field
+        setState(() {
+          userName = userDoc['name'];
+          email = userDoc['email'];
+          number = userDoc['phone'];
+          gender = userDoc['gender'];
+          dob = userDoc['dob'];
+          profession = userDoc['profession'];
+
+          /// ----------- Check if profileImageUrl exists and set profile image
+          if (userDoc.get('profileImageUrl') != null) {
+            _profileImageUrl = userDoc.get('profileImageUrl');
+          }
+        });
+      }
+    }
+  }
+
+  ///   ----------------Function to fetch user properties based on userId ----------------------------///
   Future<void> fetchUserListings() async {
     try {
       String? userId = _auth.currentUser?.uid;
@@ -50,8 +96,14 @@ class _UserProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  MediaQueryData? mqData;
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+        SystemUiOverlayStyle(
+            statusBarColor: AppColors().green,
+            statusBarIconBrightness: Brightness.light));
+    mqData = MediaQuery.of(context);
     return Scaffold(
       /// -------------- here call Drawer -----------------///
       drawer: const ProfileNavigationDrawer(),
@@ -70,26 +122,28 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                 Padding(
                     padding: const EdgeInsets.only(top: 80),
                     child: ClipOval(
-                      child: Image.asset(
-                        "assets/images/dp.jpg",
-                        fit: BoxFit.cover,
-                        width: 200,
-                        height: 200,
-                      ),
+                      child: _profileImage != null
+                          ? Image.file(
+                              _profileImage!,
+                              fit: BoxFit.cover,
+                              width: 200,
+                              height: 200,
+                            )
+                          : (_profileImageUrl != null
+                              ? Image.network(
+                                  _profileImageUrl!,
+                                  fit: BoxFit.cover,
+                                  width: 200,
+                                  height: 200,
+                                )
+                              : Image.asset(
+                                  "assets/icons/user (2).png",
+                                  fit: BoxFit.cover,
+                                  width: 200,
+                                  height: 200,
+                                )),
                     )),
-                Positioned(
-                  bottom: 10,
-                  right: 115,
-                  child: CircleAvatar(
-                    minRadius: 10,
-                    child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          Icons.edit,
-                          color: AppColors().blue,
-                        )),
-                  ),
-                ),
+
                 // Menu icon for navigation drawer
                 Positioned(
                     top: 40,
@@ -111,7 +165,12 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                     top: 45,
                     right: 5,
                     child: IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Share.share(
+                          'Check out this amazing app: https://play.google.com/store/apps/details?id=com.yourapp.package',
+                          subject: 'Flat Finder',
+                        );
+                      },
                       icon: Icon(
                         Icons.share_outlined,
                         color: AppColors().green,
@@ -121,9 +180,11 @@ class _UserProfileScreenState extends State<ProfileScreen> {
               ]),
             ),
             const SizedBox(height: 10),
-            const Text(
-              "Abhimanyu Kumar",
-              style: TextStyle(fontFamily: "Poppins-Bold", fontSize: 25),
+
+            /// -------------------------------------- user name --------------------------------///
+            Text(
+              userName,
+              style: const TextStyle(fontFamily: "Poppins-Bold", fontSize: 25),
             ),
             const SizedBox(height: 10),
             // Edit profile button
@@ -162,7 +223,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
             Padding(
               padding: const EdgeInsets.only(left: 10.0, right: 10.0),
               child: SizedBox(
-                height: 100,
+                height: mqData!.size.height * 0.13,
                 child: Card(
                   color: Colors.blueAccent.withOpacity(0.2),
                   child: Padding(
@@ -175,6 +236,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                             // email, phone number
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Row(
                                   children: [
@@ -194,7 +256,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                                   ],
                                 ),
                                 Text(
-                                  "abhimanyukumar2464@gmail.com",
+                                  email,
                                   style: TextStyle(
                                       color: AppColors().darkGrey,
                                       fontSize: 12),
@@ -220,7 +282,7 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                                   width: 5,
                                 ),
                                 Text(
-                                  "+91 9608893754",
+                                  number,
                                   style: TextStyle(color: AppColors().darkGrey),
                                 )
                               ],
@@ -293,6 +355,125 @@ class _UserProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+            const SizedBox(
+              height: 10,
+            ),
+
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: Container(
+                width: double.infinity,
+                height: mqData!.size.height * 0.16,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(width: 2, color: Colors.blueAccent),
+                  color: Colors.deepPurpleAccent.shade100,
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    ///------------------ profession ------------------///
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: Card(
+                          color: Colors.yellowAccent.shade100,
+                          shadowColor: Colors.black,
+                          elevation: 4,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Profession",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: "Poppins-Medium"),
+                                ),
+                                Text(
+                                  profession,
+                                  style: TextStyle(color: AppColors().darkGrey),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// ------------------ Dob-of-birth -----------------///
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: Card(
+                          color: Colors.yellowAccent.shade100,
+                          shadowColor: Colors.black,
+                          elevation: 4,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Dob-of-birth",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: "Poppins-Medium"),
+                                ),
+                                Text(
+                                  dob,
+                                  style: TextStyle(color: AppColors().darkGrey),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// ------------------- Gender -----------------------///
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 40,
+                        child: Card(
+                          color: Colors.yellowAccent.shade100,
+                          shadowColor: Colors.black,
+                          elevation: 4,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  "Gender",
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontFamily: "Poppins-Medium"),
+                                ),
+                                Text(
+                                  gender,
+                                  style: TextStyle(color: AppColors().darkGrey),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
             // Listings title
             const SizedBox(
               height: 10,
@@ -337,20 +518,54 @@ class _UserProfileScreenState extends State<ProfileScreen> {
               itemCount: userListings.length,
               itemBuilder: (context, index) {
                 var listing = userListings[index];
-                return CardSmallSqure(
-                  title: listing['title'],
+                return InkWell(
+                  onTap: () {
+                    ///------------------------ Convert image URLs to XFile-----------------------///
+                    List<XFile> mediaFiles =
+                        (listing['imageUrls'] as List<dynamic>)
+                            .map((url) => XFile(url))
+                            .toList();
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => DetailViewScreen(
+                                  media: mediaFiles,
+                                  title: listing['title'],
+                                  location: listing['address'],
+                                  rent: listing['rent'].toString(),
+                                  dp: XFile(listing['imageUrls'][0]),
+                                  desc: listing['otherDetails'] ??
+                                      'No description available',
+                                  type: listing['propertyType'],
+                                  bedroom: listing['bedrooms'].toString(),
+                                  bathroom: listing['bathrooms'].toString(),
+                                  furnishingStatus: listing['furnishingStatus'],
+                                  allowed: listing['allowed'],
+                                  floor: listing['floor'].toString(),
+                                  availability: listing['availableFrom'],
+                                  electricity:
+                                      listing['electricityBill'] ?? "000",
+                                  cleaning: listing['cleaningBill'] ?? "000",
+                                  water: listing['waterBill'] ?? "000",
+                                  securityBill:
+                                      listing['securityMoney'] ?? "000",
+                                )));
+                  },
+                  child: CardSmallSqure(
+                    title: listing['title'],
 
-                  /// done
-                  rent: listing['rent'].toString(),
+                    /// done
+                    rent: listing['rent'].toString(),
 
-                  /// done
-                  desc: listing['description'],
+                    /// done
+                    desc: listing['description'],
 
-                  /// done
-                  imagePath: listing['imageUrls'][0],
-                  location: listing['address'],
+                    /// done
+                    imagePath: listing['imageUrls'][0],
+                    location: listing['address'],
 
-                  /// done
+                    /// done
+                  ),
                 );
               },
             ),

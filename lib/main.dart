@@ -1,10 +1,13 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flat_finder/common/about_screen.dart';
 import 'package:flat_finder/common/add_details_screen.dart';
 import 'package:flat_finder/common/add_screen.dart';
 import 'package:flat_finder/common/chat_screen.dart';
+import 'package:flat_finder/common/help_and_support_screen.dart';
 import 'package:flat_finder/common/login_and_signup/login_screen.dart';
 import 'package:flat_finder/common/login_and_signup/signup_screen.dart';
 import 'package:flat_finder/common/profile_screen.dart';
+import 'package:flat_finder/common/setting_screen.dart';
 import 'package:flat_finder/common/splace_screen.dart';
 import 'package:flat_finder/landlord/bottom_navigation_landlord.dart';
 import 'package:flat_finder/tenant/bottom_navigation_tenant.dart';
@@ -43,7 +46,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      home: const BottomNavigationTenant()
+      home: const SplaceScreen()
     );
   }
 }

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flat_finder/common/profile_screen.dart';
+import 'package:flat_finder/tenant/bottom_navigation_tenant.dart';
 import 'package:flat_finder/theme/colors.dart';
 import 'package:flat_finder/widgets/custom_dropdown.dart';
 import 'package:flat_finder/widgets/custom_text_field.dart';
@@ -70,7 +70,8 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
     "1 RK",
     "Studio",
     "Room",
-    "PG"
+    "PG",
+    "Flat/Room mate"
   ];
   String selectedBedroomsValue = "1";
   List<String> bedrooms = ["1", "2", "3"];
@@ -90,6 +91,7 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
   // Function to upload images to Firebase Storage
   Future<List<String>> _uploadImages(List<XFile> images) async {
     List<String> imageUrls = [];
+    // Generate a unique ID for the property document
     final FirebaseStorage storage = FirebaseStorage.instance;
     for (XFile image in images) {
       String fileName = Uuid().v4(); // Generate a unique file name
@@ -123,16 +125,9 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
     if (title.isEmpty ||
         rent.isEmpty ||
         securityMoney.isEmpty ||
-        electricityBill.isEmpty ||
         address.isEmpty ||
         description.isEmpty ||
         availableFrom.isEmpty ||
-        selectedPropertyValue == null ||
-        selectedBedroomsValue == null ||
-        selectedBathoomsValue == null ||
-        selectedFurnishingStatusValue == null ||
-        selectedAllowedValue == null ||
-        selectedFloorValue == null ||
         widget.imageFromAddScreen == null ||
         widget.imageFromAddScreen!.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -149,9 +144,12 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
 
     // Upload images and get their URLs
     List<String> imageUrls = await _uploadImages(widget.imageFromAddScreen!);
+    String propertyId = FirebaseFirestore.instance.collection('properties').doc().id;
+
 
     // Prepare property details
     Map<String, dynamic> propertyDetails = {
+      'propertyId': propertyId,
       'title': title,
       'rent': rent,
       'securityMoney': securityMoney,
@@ -182,7 +180,7 @@ class _AddDetailsScreenState extends State<AddDetailsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Property details posted successfully')),
       );
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen())) ;
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const BottomNavigationTenant(selectedIndex: 4,))) ;
     } catch (e) {
       print("Error posting details: $e");
       ScaffoldMessenger.of(context).showSnackBar(
